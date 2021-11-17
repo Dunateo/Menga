@@ -21,9 +21,9 @@ The project is based on ebpf technology which allows for a wide variety of hook 
 
 [https://apt.llvm.org/](https://apt.llvm.org/)
 
-`bash -c "$(wget -O - [https://apt.llvm.org/llvm.sh](https://apt.llvm.org/llvm.sh))`
+`bash -c "$(wget -O -(https://apt.llvm.org/llvm.sh))"`
 
-lvm-config --version **should work**
+llvm-config --version **should work**
 
 # Install dependencies
 
