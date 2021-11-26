@@ -5,11 +5,11 @@ authors = ["Valentin Bru <valentin.bru@isen.yncrea.fr>"]
 edition = "2018"
 
 [build-dependencies]
-cargo-bpf = { version = "1.0", default-features = false, features = ["build"] }
+cargo-bpf = { version = "2.2.0", default-features = false, features = ["build"] }
 
 [dependencies]
 probes = { path = "../firewall-probes", package = "firewall-probes" }
 libc = "0.2"
 tokio = { version = "^0.2.4", features = ["signal", "time"] }
-redbpf = { version = "1.3.0", features = ["load"] }
+redbpf = { version = "2.2.0", features = ["load"] }
 futures = "0.3"
