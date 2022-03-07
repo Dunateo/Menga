@@ -1,3 +1,0 @@
-[workspace]
-
-members = ["tcpv4_tracing/firewall-probes", "tcpv4_tracing/firewall-userspace"]
