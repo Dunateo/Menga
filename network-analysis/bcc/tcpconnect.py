@@ -439,12 +439,12 @@ def save_ipv4_event(cpu, data, size):
         printb(b"%-6d" % event.uid, nl="")
     dest_ip = inet_ntop(AF_INET, pack("I", event.daddr)).encode()
     if args.lport:
-        printb(b"%-6d %-12.12s %-2d %-16s %-6d %-16s %-6d %s" % (event.pid,
+        printb(b"%-6d;%-12.12s;%-2d;%-16s;%-6d;%-16s;%-6d %s" % (event.pid,
             event.task, event.ip,
             inet_ntop(AF_INET, pack("I", event.saddr)).encode(), event.lport,
             dest_ip, event.dport, print_dns(dest_ip)),file=open(filename, 'w'))
     else:
-        printb(b"%-6d %-12.12s %-2d %-16s %-16s %-6d %s" % (event.pid,
+        printb(b"%-6d;%-12.12s;%-2d;%-16s;%-16s;%-6d %s" % (event.pid,
             event.task, event.ip,
             inet_ntop(AF_INET, pack("I", event.saddr)).encode(),
             dest_ip, event.dport, print_dns(dest_ip)), file=open(filename, 'w'))
@@ -455,7 +455,7 @@ def save_ipv6_event(cpu, data, size):
     event = b["ipv6_events"].event(data)
     global start_ts
     global cnt
-    filename = 'tmp/'+ str(args.output) + str(cnt)
+    filename = 'tmpipv6/'+ str(args.output) + str(cnt)
 
     if args.timestamp:
         if start_ts == 0:
@@ -465,12 +465,12 @@ def save_ipv6_event(cpu, data, size):
         printb(b"%-6d" % event.uid, nl="")
     dest_ip = inet_ntop(AF_INET6, event.daddr).encode()
     if args.lport:
-        printb(b"%-6d %-12.12s %-2d %-16s %-6d %-16s %-6d %s" % (event.pid,
+        printb(b"%-6d;%-12.12s;%-2d;%-16s;%-6d;%-16s;%-6d %s" % (event.pid,
             event.task, event.ip,
             inet_ntop(AF_INET6, event.saddr).encode(), event.lport,
             dest_ip, event.dport, print_dns(dest_ip)),file=open(filename, 'w'))
     else:
-        printb(b"%-6d %-12.12s %-2d %-16s %-16s %-6d %s" % (event.pid,
+        printb(b"%-6d;%-12.12s;%-2d;%-16s;%-16s;%-6d %s" % (event.pid,
             event.task, event.ip,
             inet_ntop(AF_INET6, event.saddr).encode(),
             dest_ip, event.dport, print_dns(dest_ip)),file=open(filename, 'w'))
