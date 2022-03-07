@@ -31,6 +31,7 @@ from socket import inet_ntop, ntohs, AF_INET, AF_INET6
 from struct import pack
 from time import sleep
 from datetime import datetime
+from save import create_tcpconnectDataframe, add_lign_tcpconnectDataframe,  export_dataframe_tocsv
 
 # arguments
 examples = """examples:
@@ -327,6 +328,10 @@ delete_and_return:
 
 """
 
+df = ""
+if args.output:
+    df = create_tcpconnectDataframe()
+
 if args.count and args.dns:
     print("Error: you may not specify -d/--dns with -c/--count.")
     exit()
@@ -417,6 +422,60 @@ def print_ipv6_event(cpu, data, size):
             event.task, event.ip,
             inet_ntop(AF_INET6, event.saddr).encode(),
             dest_ip, event.dport, print_dns(dest_ip)))
+
+def save_ipv4_event(cpu, data, size):
+    global cnt
+    global start_ts
+    event = b["ipv4_events"].event(data)
+    #lign = {'PID': event.pid, 'COMM': event.task, 'SADDR': event.ip , 'DADDR':dest_ip, 'DPORT':event.dport}
+    filename = 'tmp/'+ str(args.output) + str(cnt)
+    #printb(b"%-6d" % (event.pid), file=open(filename, 'w'))
+    
+    if args.timestamp:
+        if start_ts == 0:
+            start_ts = event.ts_us
+        printb(b"%-9.3f" % ((float(event.ts_us) - start_ts) / 1000000), nl="")
+    if args.print_uid:
+        printb(b"%-6d" % event.uid, nl="")
+    dest_ip = inet_ntop(AF_INET, pack("I", event.daddr)).encode()
+    if args.lport:
+        printb(b"%-6d %-12.12s %-2d %-16s %-6d %-16s %-6d %s" % (event.pid,
+            event.task, event.ip,
+            inet_ntop(AF_INET, pack("I", event.saddr)).encode(), event.lport,
+            dest_ip, event.dport, print_dns(dest_ip)),file=open(filename, 'w'))
+    else:
+        printb(b"%-6d %-12.12s %-2d %-16s %-16s %-6d %s" % (event.pid,
+            event.task, event.ip,
+            inet_ntop(AF_INET, pack("I", event.saddr)).encode(),
+            dest_ip, event.dport, print_dns(dest_ip)), file=open(filename, 'w'))
+    
+    cnt=cnt+1
+
+def save_ipv6_event(cpu, data, size):
+    event = b["ipv6_events"].event(data)
+    global start_ts
+    global cnt
+    filename = 'tmp/'+ str(args.output) + str(cnt)
+
+    if args.timestamp:
+        if start_ts == 0:
+            start_ts = event.ts_us
+        printb(b"%-9.3f" % ((float(event.ts_us) - start_ts) / 1000000), nl="")
+    if args.print_uid:
+        printb(b"%-6d" % event.uid, nl="")
+    dest_ip = inet_ntop(AF_INET6, event.daddr).encode()
+    if args.lport:
+        printb(b"%-6d %-12.12s %-2d %-16s %-6d %-16s %-6d %s" % (event.pid,
+            event.task, event.ip,
+            inet_ntop(AF_INET6, event.saddr).encode(), event.lport,
+            dest_ip, event.dport, print_dns(dest_ip)),file=open(filename, 'w'))
+    else:
+        printb(b"%-6d %-12.12s %-2d %-16s %-16s %-6d %s" % (event.pid,
+            event.task, event.ip,
+            inet_ntop(AF_INET6, event.saddr).encode(),
+            dest_ip, event.dport, print_dns(dest_ip)),file=open(filename, 'w'))
+    
+    cnt=cnt+1
 
 def depict_cnt(counts_tab, l3prot='ipv4'):
     for k, v in sorted(counts_tab.items(),
@@ -546,14 +605,22 @@ else:
         print()
 
     start_ts = 0
+    cnt = 0
 
     # read events
     b["ipv4_events"].open_perf_buffer(print_ipv4_event)
     b["ipv6_events"].open_perf_buffer(print_ipv6_event)
     if args.dns:
         b["dns_events"].open_perf_buffer(save_dns)
+    if args.output:
+        b["ipv4_events"].open_perf_buffer(save_ipv4_event)
+        b["ipv6_events"].open_perf_buffer(save_ipv6_event)
+    
     while True:
         try:
             b.perf_buffer_poll()
         except KeyboardInterrupt:
+            if(df != ""):
+                export_dataframe_tocsv(df,args.output)
+            
             exit()
