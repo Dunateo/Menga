@@ -32,7 +32,7 @@ from struct import pack
 from time import sleep
 from datetime import datetime
 import os
-from save import add_content
+from save import add_content, delete_directory, create_directory
 
 # arguments
 examples = """examples:
@@ -329,6 +329,9 @@ delete_and_return:
 
 """
 
+if args.output:
+    create_directory(args.output)
+
 if args.count and args.dns:
     print("Error: you may not specify -d/--dns with -c/--count.")
     exit()
@@ -425,7 +428,7 @@ def save_ipv4_event(cpu, data, size):
     global start_ts
     event = b["ipv4_events"].event(data)
     #lign = {'PID': event.pid, 'COMM': event.task, 'SADDR': event.ip , 'DADDR':dest_ip, 'DPORT':event.dport}
-    filename = 'tmp/'+ str(args.output) + str(cnt)
+    filename = args.output +'/'+ str(args.output) + str(cnt)
     #printb(b"%-6d" % (event.pid), file=open(filename, 'w'))
     
     if args.timestamp:
@@ -452,7 +455,7 @@ def save_ipv6_event(cpu, data, size):
     event = b["ipv6_events"].event(data)
     global start_ts
     global cnt
-    filename = 'tmpipv6/'+ str(args.output) + str(cnt)
+    filename = args.output+'/'+ str(args.output) + str(cnt)+"ipv6"
 
     if args.timestamp:
         if start_ts == 0:
@@ -620,7 +623,7 @@ else:
             b.perf_buffer_poll()
         except KeyboardInterrupt:
             if args.output:
-                directory='tmp/'
+                directory=args.output
                 add_content(args.output, "TIMESTAMP;PID;COMM;EVENT;SADDR;DADDR;DPORT\n", "w")
 
                 for filename in os.listdir(directory):
@@ -630,7 +633,8 @@ else:
                             content=file.read()
                             content = content.replace(" ","")
                             content = str(os.path.getmtime(f))+';'+content
-                            
+
                             add_content(args.output,content,"a")
-            
+                
+                delete_directory(directory)
             exit()
