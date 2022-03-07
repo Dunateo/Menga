@@ -31,7 +31,8 @@ from socket import inet_ntop, ntohs, AF_INET, AF_INET6
 from struct import pack
 from time import sleep
 from datetime import datetime
-from save import create_tcpconnectDataframe, add_lign_tcpconnectDataframe,  export_dataframe_tocsv
+import os
+from save import add_content
 
 # arguments
 examples = """examples:
@@ -328,10 +329,6 @@ delete_and_return:
 
 """
 
-df = ""
-if args.output:
-    df = create_tcpconnectDataframe()
-
 if args.count and args.dns:
     print("Error: you may not specify -d/--dns with -c/--count.")
     exit()
@@ -612,6 +609,8 @@ else:
     b["ipv6_events"].open_perf_buffer(print_ipv6_event)
     if args.dns:
         b["dns_events"].open_perf_buffer(save_dns)
+
+    #when specify an output generate a temporary csv 
     if args.output:
         b["ipv4_events"].open_perf_buffer(save_ipv4_event)
         b["ipv6_events"].open_perf_buffer(save_ipv6_event)
@@ -620,7 +619,18 @@ else:
         try:
             b.perf_buffer_poll()
         except KeyboardInterrupt:
-            if(df != ""):
-                export_dataframe_tocsv(df,args.output)
+            if args.output:
+                directory='tmp/'
+                add_content(args.output, "TIMESTAMP;PID;COMM;EVENT;SADDR;DADDR;DPORT\n", "w")
+
+                for filename in os.listdir(directory):
+                    f = os.path.join(directory,filename)
+                    if os.path.isfile(f):
+                        with open(f) as file :
+                            content=file.read()
+                            content = content.replace(" ","")
+                            content = str(os.path.getmtime(f))+';'+content
+                            
+                            add_content(args.output,content,"a")
             
             exit()
