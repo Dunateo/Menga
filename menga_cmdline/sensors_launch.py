@@ -13,7 +13,6 @@ def start_sensors(pid, output, csvflag):
     net.output = output
     #csv flas
     if csvflag:
-        net.output = "generic.csv"
         net.flagcsv = True
 
     net.start()
