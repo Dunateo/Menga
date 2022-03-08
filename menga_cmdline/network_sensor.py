@@ -21,7 +21,7 @@ class Network_sensor(Sensor):
         #print('Terminate') 
 
     def get_files(self):
-        resultPath = str(os.path.abspath('./'+self.output))
+        resultPath = str(os.path.abspath('./'+'network-'+self.output))
         if self.flagcsv:
             print(resultPath)
         return resultPath
