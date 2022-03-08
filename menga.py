@@ -48,12 +48,13 @@ if args.image:
 #Time Based Mode 
 #real time 
 if args.realtime:
+    start_sensors("3704", args.output
 
     while True:
         try:
-            print("not ctlc")
+            files_sensors()
         except KeyboardInterrupt:
-            print("Bye tl+c")
+            stop_sensors()
             exit()
 
 #duration time
