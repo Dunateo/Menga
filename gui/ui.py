@@ -25,8 +25,12 @@ def list_process_docker(docker_list: Listbox, container_list: any, process_list:
         process_list.insert(END, str(cpt) + ". [PID] " + str(x[1]) + " ; [CMD] " + str(x[7]))
 
 # Function to analyze the cpu usage of the selected docker
-def start_cpu_analysis():
+def start_cpu_analysis(docker_list: Listbox):
     print("Starting CPU analysis")
+    line = docker_list.curselection()[0]
+    value = docker_list.get(line)
+    l_val, r_val = value.split("[ID] ", 1)
+    os.system("./menga_start_ProfileProcessCPU.sh -id " + r_val)
 
 # Function to analyze the selected network interface
 def start_network_analysis():
@@ -138,7 +142,7 @@ def create_main_window():
     refresh_button_docker.pack()
 
     # Start Button
-    start_button_cpu = Button(docker_list_frame, text="Start", command=start_cpu_analysis)
+    start_button_cpu = Button(docker_list_frame, text="Start", command=partial(start_cpu_analysis, docker_list))
     start_button_cpu.pack()
 
     # Last Analysis Frame
