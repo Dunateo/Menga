@@ -2,6 +2,7 @@
 import sys
 sys.path.append('./menga_cmdline')
 from sensors_launch import start_sensors, stop_sensors, files_sensors
+from docker_launch import docker_start, docker_stop
 import argparse
 import time
 
@@ -34,21 +35,19 @@ parser.add_argument("-dt", "--durationtime",
 
 args = parser.parse_args()
 
-if args.output:
-    print("output option")
+pid=""
 
-if args.csv:
-    print("csv option")
 
 if args.image:
     print(args.image)
+    pid = docker_start()
 
 
 
 #Time Based Mode 
 #real time 
 if args.realtime:
-    start_sensors("3704", args.output
+    start_sensors("3704", args.output, args.csv)
 
     while True:
         try:
@@ -62,12 +61,13 @@ if args.durationtime:
 
     start_time = time.time()
     seconds = float(args.durationtime)
-    start_sensors("3704", args.output)
+    start_sensors("3704", args.output, args.csv)
 
     while True:
         current_time = time.time()
         elapsed_time = current_time - start_time
-    
+
+        #break the loop 
         if elapsed_time >= seconds:
             print("Analysis duration: " + str(int(elapsed_time))  + " seconds")
             files_sensors()

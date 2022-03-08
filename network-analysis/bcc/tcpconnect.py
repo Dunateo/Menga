@@ -574,7 +574,7 @@ if args.dns:
     b.attach_kprobe(event="udp_recvmsg", fn_name="trace_udp_recvmsg")
     b.attach_kretprobe(event="udp_recvmsg", fn_name="trace_udp_ret_recvmsg")
 
-print("Tracing connect ... Hit Ctrl-C to end")
+#print("Tracing connect ... Hit Ctrl-C to end")
 if args.count:
     try:
         while True:
