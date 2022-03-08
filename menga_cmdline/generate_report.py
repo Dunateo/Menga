@@ -80,8 +80,8 @@ def add_kernel_analysis(document, path):
     document.add_page_break()
     return document
 
-def generate_report(output, setup, network_path, cpu_path, kernel_path):
-    document = Document("template-menga.docx")
+def generate_menga_report(output, setup, network_path, cpu_path, kernel_path):
+    document = Document("./menga_cmdline/template-menga.docx")
     document = add_setup_information(document,setup)
     add_network_analysis(document, network_path)
     add_cpu_analysis(document, cpu_path)

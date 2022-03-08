@@ -23,4 +23,4 @@ def stop_sensors():
     
 #get the files sensors
 def files_sensors():
-    net.get_files()
+    return net.get_files() , "/home/valentin/Documents/Menga/perf.svg", "/home/valentin/Documents/Menga/kernel-result.csv"

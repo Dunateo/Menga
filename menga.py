@@ -3,6 +3,7 @@ import sys
 sys.path.append('./menga_cmdline')
 from sensors_launch import start_sensors, stop_sensors, files_sensors
 from docker_launch import docker_start, docker_stop, get_container_mainPid
+from generate_report import generate_menga_report
 import argparse
 import time
 
@@ -78,9 +79,20 @@ if args.durationtime:
         #break the loop 
         if elapsed_time >= seconds:
             print("Analysis duration: " + str(int(elapsed_time))  + " seconds")
-            files_sensors()
+            #sensors
+            netpath, cpupath, kernelpath= files_sensors()
             stop_sensors()
+
+            #report generation
+            tab=(str(args.image),str(pid), str(int(elapsed_time)))
+            generate_menga_report(str(args.output)+'.docx',tab, netpath, cpupath, kernelpath)
+            
+            #docker stop
             docker_stop(container)
             exit()
 
 docker_stop(container)
+
+
+
+
