@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import argparse
+import time
 
 # arguments
 examples = """examples:
@@ -18,11 +19,11 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument("-o", "--output",
     help="include the output name")
-parser.add_argument("-csv", "--csv",
+parser.add_argument("-csv", "--csv", action="store_true",
     help="dump all the sensor csv")
 parser.add_argument("-i", "--image",
     help="include the docker image name")
-parser.add_argument("-rt", "--realtime",
+parser.add_argument("-rt", "--realtime", action="store_true",
     help="realtime mode")
 parser.add_argument("-dt", "--durationtime",
     help="duratime mode in seconds")
@@ -39,8 +40,29 @@ if args.csv:
 if args.image:
     print(args.image)
 
-if args.realtime:
-    print(args.realtime)
 
+
+#Time Based Mode 
+#real time 
+if args.realtime:
+
+    while True:
+        try:
+            print("not ctlc")
+        except KeyboardInterrupt:
+            print("Bye tl+c")
+            exit()
+
+#duration time
 if args.durationtime:
-    print(args.durationtime)
+
+    start_time = time.time()
+    seconds = float(args.durationtime)
+
+    while True:
+        current_time = time.time()
+        elapsed_time = current_time - start_time
+    
+        if elapsed_time >= seconds:
+            print("Analysis duration: " + str(int(elapsed_time))  + " seconds")
+            exit()
