@@ -22,6 +22,8 @@ from bcc.utils import printb
 import argparse
 from datetime import datetime, timedelta
 import os
+from save import add_content, delete_directory, create_directory
+
 
 # arguments
 examples = """examples:
@@ -43,6 +45,8 @@ parser = argparse.ArgumentParser(
     description="Trace open() syscalls",
     formatter_class=argparse.RawDescriptionHelpFormatter,
     epilog=examples)
+parser.add_argument("-o", "--output",
+    help="include the output name")
 parser.add_argument("-T", "--timestamp", action="store_true",
     help="include timestamp on output")
 parser.add_argument("-U", "--print-uid", action="store_true",
@@ -258,6 +262,11 @@ bpf_text_kfunc_body = """
 }
 """
 
+directory = ""
+if args.output:
+    directory = str(args.output).replace(".","")
+    create_directory(directory)
+
 b = BPF(text='')
 # open and openat are always in place since 2.6.16
 fnname_open = b.get_syscall_prefix().decode() + 'open'
@@ -332,6 +341,8 @@ if not is_support_kfunc:
 
 initial_ts = 0
 
+cnt = 0
+
 # header
 if args.timestamp:
     print("%-14s" % ("TIME(s)"), end="")
@@ -347,7 +358,8 @@ print("PATH")
 def print_event(cpu, data, size):
     event = b["events"].event(data)
     global initial_ts
-
+    global cnt
+    filename = directory +'/'+ str(args.output) + str(cnt)
     # split return value into FD and errno columns
     if event.ret >= 0:
         fd_s = event.ret
@@ -367,19 +379,20 @@ def print_event(cpu, data, size):
 
     if args.timestamp:
         delta = event.ts - initial_ts
-        printb(b"%-14.9f" % (float(delta) / 1000000), nl="")
+        printb(b"%-14.9f" % (float(delta) / 1000000),file=open(filename, 'w'), nl="")
 
     if args.print_uid:
-        printb(b"%-6d" % event.uid, nl="")
+        printb(b"%-6d" % event.uid, file=open(filename, 'w'),nl="")
 
-    printb(b"%-6d %-16s %4d %3d " %
+    printb(b"%-6d;%-16s;%4d;%3d " %
            (event.id & 0xffffffff if args.tid else event.id >> 32,
-            event.comm, fd_s, err), nl="")
+            event.comm, fd_s, err), file=open(filename, 'w'),nl="")
 
     if args.extended_fields:
-        printb(b"%08o " % event.flags, nl="")
+        printb(b"%08o " % event.flags,file=open(filename, 'w'), nl="")
 
     printb(b'%s' % event.fname)
+    cnt = cnt+1
 
 # loop with callback to print_event
 b["events"].open_perf_buffer(print_event, page_cnt=64)
@@ -388,4 +401,35 @@ while not args.duration or datetime.now() - start_time < args.duration:
     try:
         b.perf_buffer_poll()
     except KeyboardInterrupt:
+        if args.output:
+                
+                add_content(args.output, "TIMESTAMP;PID;COMM;FD;ERR;PATH\n", "w")
+
+                for filename in os.listdir(directory):
+                    f = os.path.join(directory,filename)
+                    if os.path.isfile(f):
+                        with open(f) as file :
+                            content=file.read()
+                            content = content.replace(" ","")
+                            content = str(os.path.getmtime(f))+';'+content
+
+                            add_content(args.output,content,"a")
+                
+                delete_directory(directory)
         exit()
+if args.output:
+                
+                add_content(args.output, "TIMESTAMP;PID;COMM;FD;ERR;PATH\n", "w")
+
+                for filename in os.listdir(directory):
+                    f = os.path.join(directory,filename)
+                    if os.path.isfile(f):
+                        with open(f) as file :
+                            content=file.read()
+                            content = content.replace(" ","")
+                            content = str(os.path.getmtime(f))+';'+content
+
+                            add_content(args.output,content,"a")
+                
+                delete_directory(directory)
+exit()        
