@@ -58,7 +58,7 @@ function analyse_cpu {
     # Verify the container PID
     if [ $CONTAINER_PID -ne "-1" ]
     then
-        # Launch CPU analysis
+        # Launch CPU  analysis
         ./bcc/tools/profile.py -dF $FREQ -f $SEC -p $CONTAINER_PID | ./FlameGraph/flamegraph.pl > $OUT
     else
         echo "Container PID is wrong"
@@ -79,23 +79,25 @@ function verif_existing_args {
             echo "ID not valid"
             exit 1
         else
-            test_name_docker=`docker ps | grep -v grep | grep "$FIRST_VAL" | awk '{print $2}'`
-            nb=`ps -edf | grep -v grep | grep "$test_name_docker" | wc -l`
+            #test_name_docker=`docker ps | grep -v grep | grep "$FIRST_VAL" | awk '{print $2}'`
+            #nb=`ps -edf | grep -v grep | grep "$test_name_docker" | wc -l`
+            nb=`ps -edf | grep -v grep | grep -v "menga" | grep "$FIRST_VAL" | wc -l`
 
             # If the command result doesn't contain 1 line
             if [ $nb -ne 1 ]
             then
-                echo "Name not valid"
+                echo "PID not valid"
                 exit 1
             else
                 ID_option
                 verif_profile_args
+                analyse_cpu
             fi
         fi
     # Verify the -pid option
     elif [ $FIRST_OPT = "-pid" ]
     then
-        nb=`ps -edf | grep -v grep | grep "$FIRST_VAL" | wc -l`
+        nb=`ps -edf | grep -v grep | grep -v "menga" | grep "$FIRST_VAL" | wc -l`
 
         # If the command result doesn't contain 1 line
         if [ $nb -ne 1 ]
@@ -105,11 +107,15 @@ function verif_existing_args {
         else
             PID_option
             verif_profile_args
+            analyse_cpu
         fi
     # Verify the -name option
     elif [ $FIRST_OPT = "-name" ]
     then
-        nb=`ps -edf | grep -v grep | grep "$CONTAINER_NAME" | wc -l`
+        #nb=`ps -edf | grep -v grep | grep "$CONTAINER_NAME" | wc -l`
+
+        test_id_docker=`docker ps | grep -v grep | grep "$FIRST_VAL" | awk '{print $1}'`
+        nb=`ps -edf | grep -v grep | grep -v "menga" | grep "$test_id_docker" | wc -l`
 
         # If the command result doesn't contain 1 line
         if [ $nb -ne 1 ]
@@ -119,6 +125,7 @@ function verif_existing_args {
         else
             NAME_option
             verif_profile_args
+            analyse_cpu
         fi
     # If not the available option
     else
@@ -129,6 +136,7 @@ function verif_existing_args {
 function ID_option {
     CONTAINER_NAME=`docker ps | grep -v grep | grep "$FIRST_VAL" | awk '{print $2}'`
     CONTAINER_PID=`ps -edf | grep -v grep | grep "$CONTAINER_NAME" | awk '{print $2}'`
+    CONTAINER_PID=`ps -edf | grep -v grep | grep -v "menga" | grep "$FIRST_VAL" | awk '{print $2}'`
 }
 
 function PID_option {
@@ -137,6 +145,7 @@ function PID_option {
 
 function NAME_option {
     CONTAINER_PID=`ps -edf | grep -v grep | grep "$CONTAINER_NAME" | awk '{print $2}'`
+    CONTAINER_PID=`ps -edf | grep -v grep | grep -v "menga" | grep "$FIRST_VAL" | awk '{print $2}'`
 }
 
 function verif_profile_args {
