@@ -1,4 +1,7 @@
 #!/usr/bin/python
+import sys
+sys.path.append('./menga_cmdline')
+from sensors_launch import start_sensors, stop_sensors, files_sensors
 import argparse
 import time
 
@@ -58,6 +61,7 @@ if args.durationtime:
 
     start_time = time.time()
     seconds = float(args.durationtime)
+    start_sensors("3704", args.output)
 
     while True:
         current_time = time.time()
@@ -65,4 +69,6 @@ if args.durationtime:
     
         if elapsed_time >= seconds:
             print("Analysis duration: " + str(int(elapsed_time))  + " seconds")
+            files_sensors()
+            stop_sensors()
             exit()
