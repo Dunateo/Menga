@@ -2,7 +2,7 @@
 import sys
 sys.path.append('./menga_cmdline')
 from sensors_launch import start_sensors, stop_sensors, files_sensors
-from docker_launch import docker_start, docker_stop
+from docker_launch import docker_start, docker_stop, get_container_mainPid
 import argparse
 import time
 
@@ -21,7 +21,7 @@ parser = argparse.ArgumentParser(
     epilog=examples)
 
 
-parser.add_argument("-o", "--output",
+parser.add_argument("-o", "--output", required=True,
     help="include the output name")
 parser.add_argument("-csv", "--csv", action="store_true",
     help="dump all the sensor csv")
@@ -30,30 +30,38 @@ parser.add_argument("-i", "--image",
 parser.add_argument("-rt", "--realtime", action="store_true",
     help="realtime mode")
 parser.add_argument("-dt", "--durationtime",
-    help="duratime mode in seconds")
+    help="duratime mode in seconds can't be use with rt")
 
 
 args = parser.parse_args()
 
 pid=""
-
-
+did=""
+container=""
+print("Menga dynamic analysis for docker image")
+print("---------------------------------------")
+#Launch docker image
 if args.image:
-    print(args.image)
-    pid = docker_start()
+    try:
+        container, did = docker_start(args.image)
+        pid = int(get_container_mainPid(did))
+    #container has not been init
+    except TypeError:
+        exit()
 
 
 
 #Time Based Mode 
 #real time 
 if args.realtime:
-    start_sensors("3704", args.output, args.csv)
+    start_sensors(pid, args.output, args.csv)
 
     while True:
         try:
             files_sensors()
         except KeyboardInterrupt:
             stop_sensors()
+            docker_stop(container)
             exit()
 
 #duration time
@@ -61,7 +69,7 @@ if args.durationtime:
 
     start_time = time.time()
     seconds = float(args.durationtime)
-    start_sensors("3704", args.output, args.csv)
+    start_sensors(pid, args.output, args.csv)
 
     while True:
         current_time = time.time()
@@ -72,4 +80,7 @@ if args.durationtime:
             print("Analysis duration: " + str(int(elapsed_time))  + " seconds")
             files_sensors()
             stop_sensors()
+            docker_stop(container)
             exit()
+
+docker_stop(container)

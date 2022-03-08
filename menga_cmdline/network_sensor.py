@@ -12,13 +12,13 @@ class Network_sensor(Sensor):
 
     def start(self):
         Network_sensor.process = subprocess.Popen(["python3", Network_sensor.fpath, "-o", self.output], shell=False)
-        print("starting")
+        #print("starting")
     
     def stop(self):
         p = self.process
         p.send_signal(signal.SIGINT)
         #outs, errs = p.communicate()
-        print('Terminate') 
+        #print('Terminate') 
 
     def get_files(self):
         resultPath = str(os.path.abspath('./'+self.output))
