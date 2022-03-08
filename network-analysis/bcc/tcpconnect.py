@@ -595,11 +595,13 @@ else:
     if args.print_uid:
         print("%-6s" % ("UID"), end="")
     if args.lport:
-        print("%-6s %-12s %-2s %-16s %-6s %-16s %-6s" % ("PID", "COMM", "IP", "SADDR",
-            "LPORT", "DADDR", "DPORT"), end="")
+        #print("%-6s %-12s %-2s %-16s %-6s %-16s %-6s" % ("PID", "COMM", "IP", "SADDR",
+        #    "LPORT", "DADDR", "DPORT"), end="")
+        var=""
     else:
-        print("%-6s %-12s %-2s %-16s %-16s %-6s" % ("PID", "COMM", "IP", "SADDR",
-            "DADDR", "DPORT"), end="")
+        #print("%-6s %-12s %-2s %-16s %-16s %-6s" % ("PID", "COMM", "IP", "SADDR",
+        #    "DADDR", "DPORT"), end="")
+        var=""
     if args.dns:
         print(" QUERY")
     else:

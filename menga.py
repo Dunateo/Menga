@@ -21,7 +21,7 @@ parser = argparse.ArgumentParser(
     epilog=examples)
 
 
-parser.add_argument("-o", "--output",
+parser.add_argument("-o", "--output", required=True,
     help="include the output name")
 parser.add_argument("-csv", "--csv", action="store_true",
     help="dump all the sensor csv")
@@ -30,7 +30,7 @@ parser.add_argument("-i", "--image",
 parser.add_argument("-rt", "--realtime", action="store_true",
     help="realtime mode")
 parser.add_argument("-dt", "--durationtime",
-    help="duratime mode in seconds")
+    help="duratime mode in seconds can't be use with rt")
 
 
 args = parser.parse_args()
@@ -38,7 +38,8 @@ args = parser.parse_args()
 pid=""
 did=""
 container=""
-
+print("Menga dynamic analysis for docker image")
+print("---------------------------------------")
 #Launch docker image
 if args.image:
     try:
