@@ -1,9 +1,10 @@
 #!/usr/bin/python
 import sys
 sys.path.append('./menga_cmdline')
-from sensors_launch import start_sensors, stop_sensors, files_sensors
+from sensors_launch import start_sensors, stop_sensors, files_sensors, files_sensor_realtime
 from docker_launch import docker_start, docker_stop, get_container_mainPid
 from generate_report import generate_menga_report
+from elastic_send import authent_es, save_es_stack
 import argparse
 import time
 
@@ -32,13 +33,21 @@ parser.add_argument("-rt", "--realtime", action="store_true",
     help="realtime mode")
 parser.add_argument("-dt", "--durationtime",
     help="duratime mode in seconds can't be use with rt")
-
+parser.add_argument("-u", "--user",
+    help="elastic user")
+parser.add_argument("-p", "--pwd",
+    help="elastic pass")
+parser.add_argument("-ip", "--ip",
+    help="elastic ip")
+parser.add_argument("-id", "--index",
+    help="elastic index")
 
 args = parser.parse_args()
 
 pid=""
 did=""
 container=""
+es=""
 print("Menga dynamic analysis for docker image")
 print("---------------------------------------")
 #Launch docker image
@@ -54,12 +63,18 @@ if args.image:
 
 #Time Based Mode 
 #real time 
-if args.realtime:
+if args.realtime and args.user and args.pwd and args.ip and args.index:
+    try:
+        es = authent_es(args.ip, '9200', args.user, args.pwd)
+    except KeyboardInterrupt:
+        exit()
+    
     start_sensors(pid, args.output, args.csv)
 
     while True:
         try:
-            files_sensors()
+            data = files_sensor_realtime()
+            save_es_stack(args.index, data, es)
         except KeyboardInterrupt:
             stop_sensors()
             docker_stop(container)
