@@ -77,6 +77,26 @@ def add_kernel_analysis(document, path):
     document.add_heading('Kernel Activity', level=1)
     document.add_paragraph('')
     document.add_paragraph('')
+    #print(path)
+    table = document.add_table(rows=0, cols=6)
+    with open(path,'r') as f:
+        for line in f:
+            data=line.split(';')
+            #print(str(data))
+            row_cells = table.add_row().cells
+
+            timestamp =data[0]
+            try:
+                timestamp='{:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.fromtimestamp(float(data[0])))
+            except ValueError:
+                timestamp = data[0]
+            
+            row_cells[0].text = timestamp
+            row_cells[1].text = data[1]
+            row_cells[2].text = data[2]
+            row_cells[3].text = data[3]
+            row_cells[4].text = data[4]
+    
     document.add_page_break()
     return document
 
