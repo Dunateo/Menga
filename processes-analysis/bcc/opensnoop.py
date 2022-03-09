@@ -23,7 +23,7 @@ import argparse
 from datetime import datetime, timedelta
 import os
 from save import add_content, delete_directory, create_directory
-
+import fileinput
 
 # arguments
 examples = """examples:
@@ -402,34 +402,32 @@ while not args.duration or datetime.now() - start_time < args.duration:
         b.perf_buffer_poll()
     except KeyboardInterrupt:
         if args.output:
-                
                 add_content(args.output, "TIMESTAMP;PID;COMM;FD;ERR;PATH\n", "w")
-
                 for filename in os.listdir(directory):
                     f = os.path.join(directory,filename)
                     if os.path.isfile(f):
                         with open(f) as file :
                             content=file.read()
                             content = content.replace(" ","")
-                            content = str(os.path.getmtime(f))+';'+content
-
+                            content = str(os.path.getmtime(f))+';'+content+"\n"
                             add_content(args.output,content,"a")
                 
                 delete_directory(directory)
         exit()
 if args.output:
-                
-                add_content(args.output, "TIMESTAMP;PID;COMM;FD;ERR;PATH\n", "w")
+    print(args.output)
+    add_content(args.output, "TIMESTAMP;PID;COMM;FD;ERR;PATH\n", "w")
+    for filename in os.listdir(directory):
+        f = os.path.join(directory,filename)
+        if os.path.isfile(f):
+            with open(f) as file :
+                    content=file.read()
+                    content = content.replace(" ","")
+                    content = str(os.path.getmtime(f))+';'+content+"\n"
+                    add_content(args.output,content,"a")
+                              
+    delete_directory(directory)
 
-                for filename in os.listdir(directory):
-                    f = os.path.join(directory,filename)
-                    if os.path.isfile(f):
-                        with open(f) as file :
-                            content=file.read()
-                            content = content.replace(" ","")
-                            content = str(os.path.getmtime(f))+';'+content
 
-                            add_content(args.output,content,"a")
-                
-                delete_directory(directory)
-exit()        
+ 
+exit()       
