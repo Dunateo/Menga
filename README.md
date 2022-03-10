@@ -18,6 +18,8 @@ The project is based on ebpf technology which allows for a wide variety of hook 
 
 <img alt="Menga logo" src="images/menga.png" width="200">
 
+Based on probes of https://github.com/iovisor/bcc
+
 ## Dependencies
 
 ```python
