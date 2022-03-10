@@ -16,7 +16,7 @@ The project is based on ebpf technology which allows for a wide variety of hook 
 
 # V1
 
-![Menga logo](images/menga.png)
+<img alt="Menga logo" src="images/menga.png" width="200">
 
 ## Dependencies
 
