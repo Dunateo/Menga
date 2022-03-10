@@ -60,3 +60,4 @@ In case you want to add your sensors it is possible to do so by implementing the
 
 - Analyse data to make correlation 
 - Finish to implements all the sensors in ui
+- Rewrite Sensors in RedBPF to allow more flexibility
