@@ -49,3 +49,14 @@ Real Time Mode
 ## ElasticSearch
 
 ![Menga kibana dashboard](images/kibana.png)
+
+## Contributions
+
+Any help is welcome, feel free to clone and pull request us your modifications.
+
+In case you want to add your sensors it is possible to do so by implementing the Sensor interface and calling it in the sensor_launch.py
+
+## Improvements
+
+- Analyse data to make correlation 
+- Finish to implements all the sensors in ui
